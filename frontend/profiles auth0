@@ -1,0 +1,45 @@
+{
+    "auth0": {
+        "nickname": "lukailic100",
+        "name": "Luka Ilic",
+        "picture": "https://s.gravatar.com/avatar/95d0bcf741b269e74ca759d164bd1257?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Flu.png",
+        "updated_at": "2022-12-05T19:53:22.752Z",
+        "email": "lukailic100@gmail.com",
+        "email_verified": false,
+        "sub": "auth0|618822e9544fc3006d59b937"
+    },
+    "google": {
+        "given_name": "Luka",
+        "family_name": "Ilić",
+        "nickname": "lukailic100",
+        "name": "Luka Ilić",
+        "picture": "https://lh3.googleusercontent.com/a/AEdFTp5DSMhCck_zhM2JGBoqTopwX4GSmeXnYja5WjPZaQ=s96-c",
+        "locale": "en",
+        "updated_at": "2022-12-05T19:52:28.906Z",
+        "email": "lukailic100@gmail.com",
+        "email_verified": true,
+        "sub": "google-oauth2|109326073269365139509"
+    },
+    "facebook": {
+        "given_name": "Luka",
+        "family_name": "Ilić",
+        "nickname": "lukailic100",
+        "name": "Luka Ilić",
+        "picture": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=5870737799655743&height=50&width=50&ext=1672862025&hash=AeTMyFECYJGqIVNCv5s",
+        "updated_at": "2022-12-05T19:53:45.295Z",
+        "email": "lukailic100@gmail.com",
+        "email_verified": true,
+        "sub": "facebook|5870737799655743"
+    },
+    "linkedin": {
+        "given_name": "Luka",
+        "family_name": "Ilić",
+        "nickname": "lukailic100",
+        "name": "Luka Ilić",
+        "picture": "https://media-exp1.licdn.com/dms/image/C4D03AQEYLelEEeCQLQ/profile-displayphoto-shrink_800_800/0/1662094340989?e=1675900800&v=beta&t=nAT1o-ElFq6dw5qz69vk1TZXm4xbwbupjuNlVe-Wh2M",
+        "updated_at": "2022-12-05T19:54:28.341Z",
+        "email": "lukailic100@gmail.com",
+        "email_verified": true,
+        "sub": "linkedin|yASJ4mQKdr"
+    }
+}
