@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.json())
 
-const uri = `mongodb+srv://${process.env.MONGO_USER}@drumre.fgl3ew5.mongodb.net/?retryWrites=true&w=majority`
+const uri = `mongodb+srv://${process.env.MONGO_USER}@cluster0.dyjsocr.mongodb.net/?retryWrites=true&w=majority`
 const client = new MongoClient(uri);
 clientConfig(client);
 listDatabases(client);
@@ -42,6 +42,10 @@ app.post("/api/save-movie", (req, res) => {
         res.status(500).send(error);
     }
 });
+
+app.get("/api/movies",async (req,res)=>{
+    res.json(await getMovies(client,null))
+})
 
 app.listen(8080, () => {
     console.log("Backend server listening on port 8080");

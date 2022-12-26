@@ -23,9 +23,7 @@ export default {
         console.log(user.value);
         // send the user's email address to your backend endpoint
         axios.post("/api/save-user", {
-          sub: user.value.sub,
-          name: user.value.name,
-          email: user.value.email
+          ...user._value
         }).then((response) => {
           console.log("SUCCESS");
           console.log(response);

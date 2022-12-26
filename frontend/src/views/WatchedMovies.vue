@@ -1,8 +1,8 @@
 <template>
-    <div class="watched-movies">
-        <h1>Watched movies</h1>
+    <div class="watched-movies pb-2">
+        <h1 class="pb-2">Watched movies</h1>
         <div class="card-group">
-            <div v-for="movie in movies" :key="movie.id" class="col-sm-4">
+            <div v-for="movie in movies" :key="movie._id" class="col-sm-4">
                 <MovieCard :movie="movie" />
             </div>
         </div>
@@ -23,14 +23,10 @@ export default {
     },
     mounted() {
         const auth0 = useAuth0();
-
-        axios.get("/api/movies/" + auth0.user.value.sub).then(response => {
-            this.movies = response.data.map(result => ({
-                id: result._id,
-                title: result.title,
-                releaseDate: result.releaseDate,
-                url: result.url,
-            }))
+        axios.get("/api/movies/" + auth0.user.value.email).then(response => {
+          console.log(response);
+          console.log("ODGOVORO")
+            this.movies = response.data
             console.log(this.movies);
         }).catch(error => {
             console.error(error);

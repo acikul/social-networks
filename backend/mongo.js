@@ -15,47 +15,58 @@ async function listDatabases(client) {
 
 async function saveUser(client, user) {
     const collection = client.db("drumre").collection("users");
-    
+    const userDb = await collection.findOne({_id: user.email})
+    let watched = [];
+    if(userDb){
+        watched = undefined;
+    }
+
     await collection.findOneAndUpdate(
-        { _id: user.sub },
+        { _id: user.email },
         {
             $set: {
-                email: user.email,
-                name: user.name
+                ...user,
+                watched
             }
         },
-        { upsert: true },
+        { upsert: true , ignoreUndefined: true},
         (error, result) => {
             if (error) {
                 console.log(error);
                 throw error;
             } else {
-                console.log("Success saving user:");
-                console.log(result);
+                // console.log("Success saving user:");
+                // console.log(result);
                 return result
             }
         }
     );
 }
 
-async function getMovies(client, user) {
-    const collection = client.db("drumre").collection("movies");
-    return await collection.find({
-        user: user
-    }).toArray()
+async function getMovies(client, email) {
+    const collectionMovies = client.db("drumre").collection("movies");
+    const collectionUsers = client.db("drumre").collection("users");
+    if(email){
+        const usersMovies = await collectionUsers.findOne({
+            _id: email
+        })
+        return await collectionMovies.find({_id:{$in:usersMovies.watched}}).toArray()
+
+        // return await collectionUsers.find({
+        //     user: user
+        // }).toArray()
+    }
+    return await collectionMovies.find().toArray()
+
 }
 
-async function saveMovie(client, movie, user) {
-    const collection = client.db("drumre").collection("movies");
-    
+async function saveMovie(client, movieId, user) {
+    const collection = client.db("drumre").collection("users");
     await collection.findOneAndUpdate(
-        { _id: movie.id },
+        { _id: user.email },
         {
-            $set: {
-                title: movie.title,
-                releaseDate: movie.releaseDate,
-                url: movie.url,
-                user: user
+            $addToSet: {
+                watched:movieId
             }
         },
         { upsert: true },
@@ -64,8 +75,8 @@ async function saveMovie(client, movie, user) {
                 console.log(error);
                 throw error;
             } else {
-                console.log("Success saving movie:");
-                console.log(result);
+                // console.log("Success saving movie:");
+                // console.log(result);
                 return result
             }
         }
