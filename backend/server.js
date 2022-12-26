@@ -2,10 +2,12 @@ const { MongoClient } = require('mongodb');
 const express = require("express");
 const bodyParser = require("body-parser")
 const { clientConfig, listDatabases, saveUser, getMovies, saveMovie } = require("./mongo.js")
+const dotenv = require('dotenv');
+dotenv.config();
 const app = express();
 app.use(bodyParser.json())
 
-const uri = "mongodb+srv://lilic:z1VX5rl5vnmg3J1U@drumre.fgl3ew5.mongodb.net/?retryWrites=true&w=majority"
+const uri = `mongodb+srv://${process.env.MONGO_USER}@drumre.fgl3ew5.mongodb.net/?retryWrites=true&w=majority`
 const client = new MongoClient(uri);
 clientConfig(client);
 listDatabases(client);
