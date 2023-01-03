@@ -13,6 +13,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/vue-fontawesome": "^3.0.1",
     "@highlightjs/vue-plugin": "^2.1.0",
+    "@innologica/vue-dropdown-menu": "^0.1.4",
     "axios": "^1.2.1",
     "bootstrap": "^5.2.3",
     "bootstrap-vue": "^2.23.1",

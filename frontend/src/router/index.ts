@@ -3,6 +3,7 @@ import Home from "../views/Home.vue";
 import Profile from "../views/Profile.vue";
 import WatchedMovies from "../views/WatchedMovies.vue"
 import SearchMovies from "../views/SearchMovies.vue"
+import PopularMovies from "../views/PopularMovies.vue"
 import { createAuthGuard } from "@auth0/auth0-vue";
 import { App } from 'vue';
 
@@ -30,6 +31,12 @@ export function createRouter(app: App): Router {
         path: "/search",
         name: "search",
         component: SearchMovies,
+        beforeEnter: createAuthGuard(app)
+      },
+      {
+        path: "/popular",
+        name: "popular",
+        component: PopularMovies,
         beforeEnter: createAuthGuard(app)
       },
     ],
