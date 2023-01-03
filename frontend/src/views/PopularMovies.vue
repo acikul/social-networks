@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     getPopularMovies() {
-      fetch(`/api/movies/${this.selected}`)
+      fetch(`/api/movies/popular/${this.selected}`)
         .then((res) => res.json())
         .then((data) => (this.movies = data))
         .catch((err) => console.log("ERROR" + err));
