@@ -35,8 +35,6 @@ async function saveUser(client, user) {
                 console.log(error);
                 throw error;
             } else {
-                // console.log("Success saving user:");
-                // console.log(result);
                 return result
             }
         }
@@ -47,14 +45,15 @@ async function getMovies(client, email) {
     const collectionMovies = client.db("drumre").collection("movies");
     const collectionUsers = client.db("drumre").collection("users");
     if(email){
-        const usersMovies = await collectionUsers.findOne({
+        console.log("heloo!");
+        const user = await collectionUsers.findOne({
             _id: email
         })
-        return await collectionMovies.find({_id:{$in:usersMovies.watched}}).toArray()
+        const watchedArr = user.watched.map(m =>
+            m.movieId
+        )
 
-        // return await collectionUsers.find({
-        //     user: user
-        // }).toArray()
+        return await collectionMovies.find({_id:{$in:watchedArr}}).toArray()
     }
     return await collectionMovies.find().toArray()
 
@@ -66,7 +65,10 @@ async function saveMovie(client, movieId, user) {
         { _id: user.email },
         {
             $addToSet: {
-                watched:movieId
+                watched: {
+                    movieId: movieId,
+                    timestamp: Date.now()
+                }
             }
         },
         { upsert: true },
