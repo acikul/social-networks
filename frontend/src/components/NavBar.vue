@@ -22,6 +22,9 @@
             <li class="nav-item" v-if="isAuthenticated">
               <router-link to="/popular" class="nav-link">Popular</router-link>
             </li>
+            <li class="nav-item" v-if="isAuthenticated">
+              <router-link to="/recommended" class="nav-link">Recommended</router-link>
+            </li>
           </ul>
           <ul class="navbar-nav d-none d-md-block">
             <li v-if="!isAuthenticated && !isLoading" class="nav-item">
