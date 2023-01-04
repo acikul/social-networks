@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 const express = require("express");
 const bodyParser = require("body-parser")
-const { clientConfig, listDatabases, saveUser, getMovies, saveMovie, getMoviesForTimeRange } = require("./mongo.js")
+const { clientConfig, listDatabases, saveUser, getMovies, saveMovie, getMoviesForTimeRange, getCategories } = require("./mongo.js")
 const dotenv = require('dotenv');
 const e = require("express");
 dotenv.config();
@@ -36,6 +36,16 @@ app.get('/api/movies/popular/:range', async (req, res) => {
     }
 })
 
+app.get("/api/movies/categories",async (req,res)=>{
+    try {
+        result = await getCategories(client)
+        console.log(result);
+        res.json(result)
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
 
 app.get("/api/movies/:user", async (req, res) => {
     try {
@@ -59,7 +69,6 @@ app.post("/api/save-movie", (req, res) => {
 app.get("/api/movies",async (req,res)=>{
     res.json(await getMovies(client,null))
 })
-
 
 app.listen(8080, () => {
     console.log("Backend server listening on port 8080");
