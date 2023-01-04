@@ -1,33 +1,64 @@
 <template>
   <div>
-    <div class="dropdown" id="main">
+    <div id="main" class="pb-4">
       <h1>Get popular movies:</h1>
-      <button
-        class="btn btn-primary dropdown-toggle fixed"
-        type="button"
-        id="dropdownMenuButton"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
+      <div
+        class="btn-group"
+        role="group"
+        aria-label="Button group with nested dropdown"
       >
-        {{ selected }}
-      </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="#" @click.prevent="selected = 'Weekly'"
-          >Weekly</a
-        >
-        <a class="dropdown-item" href="#" @click.prevent="selected = 'Monthly'"
-          >Monthly</a
-        >
-        <a class="dropdown-item" href="#" @click.prevent="selected = 'Yearly'"
-          >Yearly</a
-        >
+        <div class="dropdown btn-group" role="group">
+          <button
+            class="btn btn-primary dropdown-toggle fixed"
+            type="button"
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {{ selectedRange }}
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a
+              v-for="range in ranges"
+              :key="range"
+              class="dropdown-item"
+              href="#"
+              @click.prevent="selectedRange = range"
+            >
+              {{ range }}
+            </a>
+          </div>
+        </div>
+
+        <div class="dropdown btn-group" role="group">
+          <button
+            class="btn btn-primary dropdown-toggle fixed"
+            type="button"
+            id="dropdownMenuButton1"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {{ selectedCategory.name }}
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <a
+              v-for="category in categories"
+              :key="category"
+              class="dropdown-item"
+              href="#"
+              @click.prevent="selectedCategory = category"
+            >
+              {{ category.name }}
+            </a>
+          </div>
+        </div>
       </div>
     </div>
-
     <div class="upcoming-movies pb-2">
       <div class="card-group">
-        <div v-for="movie in movies" :key="movie._id" class="col-sm-4">
+        <div v-for="movie in filteredMovies" :key="movie._id" class="col-sm-4">
           <MovieCard :movie="movie" :user="user" />
         </div>
       </div>
@@ -44,30 +75,68 @@ export default {
   },
   data() {
     return {
-      selected: "Weekly",
       movies: [],
+      ranges: ["Weekly", "Monthly", "Yearly"],
+      categories: [{_id:-1, id:-1, name:"All"}],
+      selectedRange: "Weekly",
+      selectedCategory: {_id:-1, id:-1, name:"All"},
+      filteredMovies: [],
     };
   },
   methods: {
     getPopularMovies() {
-      fetch(`/api/movies/popular/${this.selected.toLowerCase()}`)
+      fetch(`/api/movies/popular/${this.selectedRange.toLowerCase()}`)
         .then((res) => res.json())
-        .then((data) => (this.movies = data))
+        .then((data) => {
+          this.movies = data;
+          console.log(data);
+          this.filterMovies();
+        })
         .catch((err) => console.log("ERROR" + err));
+    },
+    getCategories() {
+      fetch(`/api/movies/categories`)
+        .then((res) => res.json())
+        .then((data) => {
+          this.categories.push(...data)
+          console.log(data);
+        })
+        .catch((err) => console.log("ERROR" + err));
+    },
+    filterMovies() {
+      const filtered = []
+      if(this.selectedCategory.id != -1) {
+        this.movies.forEach(movie => {
+          if(movie.genre_ids.includes(this.selectedCategory.id)) {
+            filtered.push(movie)
+          }
+        });
+        this.filteredMovies = filtered
+      } else {
+        this.filteredMovies = []
+        this.filteredMovies.push(...this.movies)
+      }
+      console.log(filtered);
     },
   },
   mounted() {
     this.getPopularMovies();
+    this.getCategories();
+    
   },
   watch: {
-    selected: "getPopularMovies",
+    selectedRange: function() {
+      this.getPopularMovies()
+      this.filterMovies()
+    },
+    selectedCategory: "filterMovies"
   },
 };
 </script>
 
 <style>
 .fixed {
-  min-width: 100px;
+  min-width: 140px;
 }
 #main {
   display: flex;

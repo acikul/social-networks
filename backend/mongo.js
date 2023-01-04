@@ -62,6 +62,11 @@ async function getMovies(client, email) {
     return await collectionMovies.find().limit(20).toArray()
 }
 
+async function getCategories(client) {
+    const collectionCategories = client.db("drumre").collection("genres");
+    return await collectionCategories.find().toArray()
+}
+
 async function getMoviesForTimeRange(client, range) {
     const collectionMovies = client.db("drumre").collection("movies");
     const collectionUsers = client.db("drumre").collection("users");
@@ -202,5 +207,6 @@ module.exports = {
     getMovies,
     saveMovie,
     getMoviesForTimeRange,
-    getRecommendations
+    getRecommendations,
+    getCategories
 }
