@@ -44,6 +44,7 @@ app.get("/api/movies/recommend/:email",async (req, res) => {
         if (!email) {
             res.status(400).send("Error. No email provided.");
         }
+
         const result = await getRecommendations(client, email);
         res.json(result)
     }catch(error){
