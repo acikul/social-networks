@@ -13,13 +13,13 @@
         {{ selected }}
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="#" @click.prevent="selected = 'weekly'"
+        <a class="dropdown-item" href="#" @click.prevent="selected = 'Weekly'"
           >Weekly</a
         >
-        <a class="dropdown-item" href="#" @click.prevent="selected = 'monthly'"
+        <a class="dropdown-item" href="#" @click.prevent="selected = 'Monthly'"
           >Monthly</a
         >
-        <a class="dropdown-item" href="#" @click.prevent="selected = 'yearly'"
+        <a class="dropdown-item" href="#" @click.prevent="selected = 'Yearly'"
           >Yearly</a
         >
       </div>
@@ -44,13 +44,13 @@ export default {
   },
   data() {
     return {
-      selected: "weekly",
+      selected: "Weekly",
       movies: [],
     };
   },
   methods: {
     getPopularMovies() {
-      fetch(`/api/movies/popular/${this.selected}`)
+      fetch(`/api/movies/popular/${this.selected.toLowerCase()}`)
         .then((res) => res.json())
         .then((data) => (this.movies = data))
         .catch((err) => console.log("ERROR" + err));
