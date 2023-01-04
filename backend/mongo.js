@@ -59,24 +59,13 @@ async function getMovies(client, email) {
     return await collectionMovies.find().limit(20).toArray()
 }
 
-async function getMoviesForTimeRange(client, range) {
+async function getMoviesForTimeRange(client, range, genreId) {
     const collectionMovies = client.db("drumre").collection("movies");
     const collectionUsers = client.db("drumre").collection("users");
     const users = await collectionUsers.find({}).toArray();
     let currentTime = Date.now()
 
-    let timeDiffMs;
-    switch (range) {
-        case 'weekly':
-            timeDiffMs = 7 * 24 * 60 * 60 * 1000;
-            break;
-        case 'monthly':
-            timeDiffMs = 30 * 24 * 60 * 60 * 1000;
-            break;
-        case 'yearly':
-            timeDiffMs = 365 * 24 * 60 * 60 * 1000;
-            break;
-    }
+    let timeDiffMs = timeDiffForRange(range);
 
     let watchedMovies = {}
     users.forEach((user) => {
@@ -96,8 +85,17 @@ async function getMoviesForTimeRange(client, range) {
 
     console.log(moviesCount)
 
-    let dbMovies = await collectionMovies.find({_id: {$in: moviesCount}}).toArray()
-
+    let dbMovies;
+    if (genreId === "all") {
+        dbMovies = await collectionMovies.find({_id: {$in: moviesCount}}).toArray()
+    } else {
+        dbMovies = await collectionMovies.find({
+            $and: [
+                { _id: { $in: moviesCount} },
+                { genre_ids: { $in: [genreId] } }
+            ]
+        }).toArray()
+    }
     console.log(dbMovies)
 
     let result =  dbMovies.sort((a, b) => moviesCount.indexOf(a._id) - moviesCount.indexOf(b._id) )
@@ -134,6 +132,16 @@ async function saveMovie(client, movieId, user) {
     );
 }
 
+function timeDiffForRange(range) {
+    switch (range) {
+        case 'weekly':
+            return 7 * 24 * 60 * 60 * 1000;
+        case 'monthly':
+            return 30 * 24 * 60 * 60 * 1000;
+        case 'yearly':
+            return 365 * 24 * 60 * 60 * 1000;
+    }
+}
 
 module.exports = {
     clientConfig,

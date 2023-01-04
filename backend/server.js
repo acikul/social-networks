@@ -26,10 +26,10 @@ app.post("/api/save-user", (req, res) => {
 });
 
 app.get('/api/movies/popular/:range', async (req, res) => {
-    console.log('tu sam u funkciji')
+    let genreId = req.query.genreId || "all"
+
     try {
-        console.log(req.params.range)
-        result = await getMoviesForTimeRange(client, req.params.range)
+        result = await getMoviesForTimeRange(client, req.params.range, genreId)
         res.json(result)
     } catch (error) {
         res.json(error)
