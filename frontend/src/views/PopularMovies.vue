@@ -125,7 +125,10 @@ export default {
     
   },
   watch: {
-    selectedRange: "getPopularMovies",
+    selectedRange: function() {
+      this.getPopularMovies()
+      this.filterMovies()
+    },
     selectedCategory: "filterMovies"
   },
 };
