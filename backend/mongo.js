@@ -1,4 +1,4 @@
-const { ObjectID } = require("bson");
+const {ObjectID} = require("bson");
 const recommend = require('collaborative-filter');
 const fetch = require('node-fetch')
 
@@ -124,7 +124,7 @@ async function getMoviesForTimeRange(client, range) {
 
     console.log(dbMovies)
 
-    let result =  dbMovies.sort((a, b) => moviesCount.indexOf(a._id) - moviesCount.indexOf(b._id) )
+    let result = dbMovies.sort((a, b) => moviesCount.indexOf(a._id) - moviesCount.indexOf(b._id))
 
     console.log(result)
 
@@ -186,7 +186,8 @@ async function removeMovie(client, movieId, user) {
     );
 }
 
-async function getRecommendations(client, email){
+async function getRecommendations(client, email) {
+
     const collectionUsers = client.db("drumre").collection("users");
     const collectionMovies = client.db("drumre").collection("movies");
 
@@ -194,64 +195,67 @@ async function getRecommendations(client, email){
         _id: email
     })
 
-    const allUsers = await collectionUsers.find({_id: { $ne: email }, "watched.0" : {$exists:true}}).toArray();
+    const allUsers = await collectionUsers.find({_id: {$ne: email}, "watched.0": {$exists: true}}).toArray();
 
-    const userMovies = user.watched.map(mov=>mov.movieId);
+    const userMovies = user.watched.map(mov => mov.movieId);
 
-    // const  userMoviesRecommendedByApi = [];
-    // const promises = []
-    // try{
-    //     userMovies.slice(Math.abs(userMovies.length-6),userMovies.length-1).forEach(movie=>{
-    //         promises.push(
-    //             fetch(`https://api.themoviedb.org/3/movie/${movie}/recommendations?api_key=73d2b3074d67fb6b259de9374ca8f6ec&language=en-US&page=1`)
-    //             .then(res=>res.json())
-    //             .then(res=>{
-    //                 console.log(res)
-    //                 userMoviesRecommendedByApi.push(...res.results)
-    //             }));
-    //     })
-    //
-    //
-    //     await Promise.all(promises)
-    //     console.log("AAAAAAAAAAAAAAAAA")
-    //     console.log(userMoviesRecommendedByApi);
-    // }catch(error){
-    //     console.log(error)
-    // }
-
-
-    if(userMovies.length==0){
-        return []; // TODO call API for recommended or get most popular
+    if (userMovies.length == 0) {
+        return await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=73d2b3074d67fb6b259de9374ca8f6ec&language=en-US&page=1`).then(res => res.json()).then(res => res.results)
     }
+
     const similarUsers = [user]
-    allUsers.forEach(otherUser=>{
-        const otherUserMovies = otherUser.watched.map(mov=>mov.movieId);
-        const diff = userMovies.filter(x=> {
+    allUsers.forEach(otherUser => {
+        const otherUserMovies = otherUser.watched.map(mov => mov.movieId);
+        const diff = userMovies.filter(x => {
             return otherUserMovies.indexOf(x) < 0;
         });
-        if(diff.length>0){
+        if (diff.length > 0) {
             similarUsers.push(otherUser);
         }
     })
-    
-    const moviesCandidatesToRecommend = [...new Set(similarUsers.map(user=>user.watched.map(movie=>movie.movieId)).flat())];
+
+    const moviesCandidatesToRecommend = [...new Set(similarUsers.map(user => user.watched.map(movie => movie.movieId)).flat())];
+
+    if (similarUsers.length == 1) {
+        // if no similar users but has watched movies get reccomendations for those from api
+        const userMoviesRecommendedByApi = [];
+        const promises = []
+        try {
+            userMovies.slice(0,1).forEach(movie => {
+                promises.push(
+                    fetch(`https://api.themoviedb.org/3/movie/${movie}/recommendations?api_key=73d2b3074d67fb6b259de9374ca8f6ec&language=en-US&page=1`)
+                        .then(res => res.json())
+                        .then(res => {
+                            console.log(res)
+                            userMoviesRecommendedByApi.push(...res.results)
+                        }));
+            })
+
+            await Promise.all(promises)
+            console.log("AAAAAAAAAAAAAAAAA")
+            console.log(userMoviesRecommendedByApi);
+            moviesCandidatesToRecommend.push(...userMoviesRecommendedByApi)
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     const ratings = []
-    similarUsers.forEach(user=>ratings.push(createRatingArray(user.watched.map(mov=>mov.movieId), moviesCandidatesToRecommend)))
+    similarUsers.forEach(user => ratings.push(createRatingArray(user.watched.map(mov => mov.movieId), moviesCandidatesToRecommend)))
 
     const result = recommend.cFilter(ratings, 0);
 
-    const moviesToRecommend = moviesCandidatesToRecommend.filter((movie,index)=>result.includes(index)).slice(0,9);
+    const moviesToRecommend = moviesCandidatesToRecommend.filter((movie, index) => result.includes(index)).slice(0, 9);
 
     return await collectionMovies.find({_id: {$in: moviesToRecommend}}).toArray();
 }
 
-function createRatingArray(userMovies,movies){
+function createRatingArray(userMovies, movies) {
     const userRatings = []
-    movies.forEach(movie=>{
-        if(userMovies.includes(movie)){
+    movies.forEach(movie => {
+        if (userMovies.includes(movie)) {
             userRatings.push(1);
-        }else{
+        } else {
             userRatings.push(0);
         }
     })
