@@ -1,5 +1,5 @@
 const recommend = require('collaborative-filter');
-
+const fetch = require('node-fetch')
 
 async function clientConfig(client) {
     try {
@@ -153,7 +153,29 @@ async function getRecommendations(client, email){
     const allUsers = await collectionUsers.find({_id: { $ne: email }, "watched.0" : {$exists:true}}).toArray();
 
     const userMovies = user.watched.map(mov=>mov.movieId);
-    console.log(userMovies);
+
+    // const  userMoviesRecommendedByApi = [];
+    // const promises = []
+    // try{
+    //     userMovies.slice(Math.abs(userMovies.length-6),userMovies.length-1).forEach(movie=>{
+    //         promises.push(
+    //             fetch(`https://api.themoviedb.org/3/movie/${movie}/recommendations?api_key=73d2b3074d67fb6b259de9374ca8f6ec&language=en-US&page=1`)
+    //             .then(res=>res.json())
+    //             .then(res=>{
+    //                 console.log(res)
+    //                 userMoviesRecommendedByApi.push(...res.results)
+    //             }));
+    //     })
+    //
+    //
+    //     await Promise.all(promises)
+    //     console.log("AAAAAAAAAAAAAAAAA")
+    //     console.log(userMoviesRecommendedByApi);
+    // }catch(error){
+    //     console.log(error)
+    // }
+
+
     if(userMovies.length==0){
         return []; // TODO call API for recommended or get most popular
     }
@@ -167,23 +189,15 @@ async function getRecommendations(client, email){
             similarUsers.push(otherUser);
         }
     })
-
-    console.log(similarUsers.map(user=>user.watched))
-    console.log(similarUsers.length)
-
+    
     const moviesCandidatesToRecommend = [...new Set(similarUsers.map(user=>user.watched.map(movie=>movie.movieId)).flat())];
-
-
-    //TODO ADD CALL TO API FOR ADDITIONAL RECOMMENDATIONS IN ORDER TO AVOID COLD BOOT PROBLEMS
 
     const ratings = []
     similarUsers.forEach(user=>ratings.push(createRatingArray(user.watched.map(mov=>mov.movieId), moviesCandidatesToRecommend)))
-    console.log(moviesCandidatesToRecommend)
-    console.log("AYYYYYYYYYYY")
-    console.log(ratings)
+
     const result = recommend.cFilter(ratings, 0);
 
-    const moviesToRecommend = moviesCandidatesToRecommend.filter((movie,index)=>result.includes(index))
+    const moviesToRecommend = moviesCandidatesToRecommend.filter((movie,index)=>result.includes(index)).slice(0,9);
 
     return await collectionMovies.find({_id: {$in: moviesToRecommend}}).toArray();
 }
