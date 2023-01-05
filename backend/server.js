@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 const express = require("express");
 const bodyParser = require("body-parser")
-const { clientConfig, listDatabases, saveUser, getMovies, saveMovie, getMoviesForTimeRange, getCategories } = require("./mongo.js")
+const { clientConfig, listDatabases, saveUser, getMovies, saveMovie, getMoviesForTimeRange, getCategories, getMovie } = require("./mongo.js")
 const dotenv = require('dotenv');
 const e = require("express");
 dotenv.config();
@@ -46,6 +46,16 @@ app.get("/api/movies/categories",async (req,res)=>{
     }
 })
 
+app.get("/api/movie/details/:id",async (req,res)=>{
+    try {
+        result = await getMovie(client, req.params.id)
+        
+        console.log(`GET MOVIE DETAILS RESULT: ${result}`);
+        res.json(result)
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
 
 app.get("/api/movies/:user", async (req, res) => {
     try {

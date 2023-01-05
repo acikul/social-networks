@@ -1,3 +1,5 @@
+const { ObjectID } = require("bson");
+
 async function clientConfig(client) {
     try {
         await client.connect();
@@ -57,6 +59,15 @@ async function getMovies(client, email) {
         return await collectionMovies.find({_id: {$in: watchedArr}}).toArray()
     }
     return await collectionMovies.find().limit(20).toArray()
+}
+
+async function getMovie(client, id) {
+    const collectionMovies = client.db("drumre").collection("movies");
+    console.log(id);
+    const _id = parseInt(id)
+    return await collectionMovies.findOne({
+        _id: _id
+    })
 }
 
 async function getCategories(client) {
@@ -148,4 +159,5 @@ module.exports = {
     saveMovie,
     getMoviesForTimeRange,
     getCategories,
+    getMovie
 }

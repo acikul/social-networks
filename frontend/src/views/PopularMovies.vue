@@ -59,7 +59,7 @@
     <div class="upcoming-movies pb-2">
       <div class="card-group">
         <div v-for="movie in filteredMovies" :key="movie._id" class="col-sm-4">
-          <MovieCard :movie="movie" :user="user" />
+          <MovieCard :movie="movie" :user="user" @click="showMovieDetails(movie.id)"/>
         </div>
       </div>
     </div>
@@ -118,6 +118,9 @@ export default {
       }
       console.log(filtered);
     },
+    showMovieDetails(movieId) {
+      this.$router.push({ path: `/details/${movieId}` })
+    }
   },
   mounted() {
     this.getPopularMovies();

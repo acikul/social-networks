@@ -5,6 +5,7 @@ import WatchedMovies from "../views/WatchedMovies.vue"
 import SearchMovies from "../views/SearchMovies.vue"
 import PopularMovies from "../views/PopularMovies.vue"
 import RecommendedMovies from "../views/RecommendedMovies.vue"
+import MovieDetails from "../views/MovieDetails.vue"
 import { createAuthGuard } from "@auth0/auth0-vue";
 import { App } from 'vue';
 
@@ -45,6 +46,12 @@ export function createRouter(app: App): Router {
         name: "recommended",
         component: RecommendedMovies,
         beforeEnter: createAuthGuard(app)
+      },
+      {
+        path: "/details/:id",
+        name: "details",
+        component: MovieDetails,
+        props: true
       },
     ],
     history: createWebHashHistory()
