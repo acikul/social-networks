@@ -39,7 +39,7 @@ app.get('/api/movies/popular/:range', async (req, res) => {
 
 
 app.get("/api/movies/recommend/:email",async (req, res) => {
-    try{
+
         const email = req.params.email;
         if (!email) {
             res.status(400).send("Error. No email provided.");
@@ -47,9 +47,7 @@ app.get("/api/movies/recommend/:email",async (req, res) => {
 
         const result = await getRecommendations(client, email);
         res.json(result)
-    }catch(error){
-        res.status(500).send(error);
-    }
+
 
 })
 

@@ -196,8 +196,8 @@ async function getRecommendations(client, email) {
     })
 
     const allUsers = await collectionUsers.find({_id: {$ne: email}, "watched.0": {$exists: true}}).toArray();
-
-    const userMovies = user.watched.map(mov => mov.movieId);
+    console.log(user.watched)
+    const userMovies = user.watched.filter(x=>Number.isInteger(x.movieId)).map(mov => mov.movieId);
 
     if (userMovies.length == 0) {
         return await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=73d2b3074d67fb6b259de9374ca8f6ec&language=en-US&page=1`).then(res => res.json()).then(res => res.results)
@@ -214,30 +214,11 @@ async function getRecommendations(client, email) {
         }
     })
 
-    const moviesCandidatesToRecommend = [...new Set(similarUsers.map(user => user.watched.map(movie => movie.movieId)).flat())];
-
+    const moviesCandidatesToRecommend = [...new Set(similarUsers.map(user => user.watched.filter(x=>Number.isInteger(x.movieId)).map(movie => movie.movieId)).flat())];
     if (similarUsers.length == 1) {
         // if no similar users but has watched movies get reccomendations for those from api
-        const userMoviesRecommendedByApi = [];
-        const promises = []
-        try {
-            userMovies.slice(0,1).forEach(movie => {
-                promises.push(
-                    fetch(`https://api.themoviedb.org/3/movie/${movie}/recommendations?api_key=73d2b3074d67fb6b259de9374ca8f6ec&language=en-US&page=1`)
-                        .then(res => res.json())
-                        .then(res => {
-                            console.log(res)
-                            userMoviesRecommendedByApi.push(...res.results)
-                        }));
-            })
-
-            await Promise.all(promises)
-            console.log("AAAAAAAAAAAAAAAAA")
-            console.log(userMoviesRecommendedByApi);
-            moviesCandidatesToRecommend.push(...userMoviesRecommendedByApi)
-        } catch (error) {
-            console.log(error)
-        }
+        console.log("IM HERREEEEEEEEEEEEEEEEE")
+        await fetchFromApi(userMovies, moviesCandidatesToRecommend)
     }
 
     const ratings = []
@@ -247,8 +228,41 @@ async function getRecommendations(client, email) {
 
     const moviesToRecommend = moviesCandidatesToRecommend.filter((movie, index) => result.includes(index)).slice(0, 9);
 
+
+
+    if(result.length==0){
+        await fetchFromApi(userMovies, moviesToRecommend)
+    }
     return await collectionMovies.find({_id: {$in: moviesToRecommend}}).toArray();
 }
+
+async function fetchFromApi(userMovies, moviesCandidatesToRecommend){
+    let userMoviesRecommendedByApi = [];
+    const promises = []
+    try {
+        userMovies.slice(0,1).forEach(movie => {
+            promises.push(
+                fetch(`https://api.themoviedb.org/3/movie/${movie}/recommendations?api_key=73d2b3074d67fb6b259de9374ca8f6ec&language=en-US&page=1`)
+                    .then(res => res.json())
+                    .then(res => {
+                        // console.log(res)
+                        userMoviesRecommendedByApi.push(...res.results)
+                    }));
+        })
+
+        await Promise.all(promises)
+        // console.log("AAAAAAAAAAAAAAAAA")
+        // console.log(userMoviesRecommendedByApi);
+        console.log(moviesCandidatesToRecommend);
+        userMoviesRecommendedByApi = userMoviesRecommendedByApi.filter(x=>Number.isInteger(x.id)).map(movie=>movie.id);
+        // console.log(userMoviesRecommendedByApi)
+        moviesCandidatesToRecommend.push(...userMoviesRecommendedByApi)
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 function createRatingArray(userMovies, movies) {
     const userRatings = []

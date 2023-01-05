@@ -26,7 +26,7 @@ export default {
   data() {
     return {
       recommendedMovies: [],
-
+      user: useAuth0().user,
     };
   },
   mounted() {

@@ -65,6 +65,9 @@ export default {
       // Call endpoint to add movie to watched list
       if(!this.$props.unwatch){
         console.log("SAVING")
+        if(!movie._id){
+          movie._id=movie.id;
+        }
         await axios.post('/api/save-movie/', {movie: movie._id, user: user});
         toast(`${movie.title} has been added to watched movies.`, {
           autoClose: 1000,
