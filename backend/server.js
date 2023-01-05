@@ -4,6 +4,7 @@ const bodyParser = require("body-parser")
 const { clientConfig, listDatabases, saveUser, getMovies, saveMovie, getMoviesForTimeRange, getCategories, getMovie } = require("./mongo.js")
 const dotenv = require('dotenv');
 const e = require("express");
+const {getRecommendations} = require("./mongo");
 dotenv.config();
 const app = express();
 app.use(bodyParser.json())
@@ -36,6 +37,22 @@ app.get('/api/movies/popular/:range', async (req, res) => {
     }
 })
 
+
+app.get("/api/movies/recommend/:email",async (req, res) => {
+    try{
+        const email = req.params.email;
+        if (!email) {
+            res.status(400).send("Error. No email provided.");
+        }
+
+        const result = await getRecommendations(client, email);
+        res.json(result)
+    }catch(error){
+        res.status(500).send(error);
+    }
+
+})
+
 app.get("/api/movies/categories",async (req,res)=>{
     try {
         result = await getCategories(client)
@@ -56,6 +73,7 @@ app.get("/api/movie/details/:id",async (req,res)=>{
         res.status(500).send(error);
     }
 })
+
 
 app.get("/api/movies/:user", async (req, res) => {
     try {
