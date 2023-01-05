@@ -36,7 +36,7 @@
             <td>{{ movie.original_language }}</td>
           </tr>
           <tr>
-            <button type="button" class="btn btn-primary" @click="addToWatched(movie)">
+            <button v-if="user" type="button" class="btn btn-primary" @click="addToWatched(movie)">
               Add to watched
             </button>
           </tr>
@@ -56,6 +56,7 @@ export default {
       categories: {},
       movie: {},
       movieCategories: [],
+      user: useAuth0().user,
     };
   },
   methods: {
@@ -69,12 +70,13 @@ export default {
         })
         .catch((err) => console.log("ERROR" + err));
     },
-    async addToWatched(movie) {
-      const auth0 = useAuth0()
+    addToWatched(movie) {
       // Call endpoint to add movie to watched list
-      await axios.post('/api/save-movie/', {movie: movie._id, user: auth0.user});
       // Redirect to watched movies page
-      this.$router.push('/watched');
+      axios.post('/api/save-movie/', {movie: movie._id, user: this.user})
+          .then(res=>this.$router.push('/watched'));
+
+
     },
   },
   async mounted() {

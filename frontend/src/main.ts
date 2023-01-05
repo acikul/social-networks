@@ -1,10 +1,10 @@
 import App from "./App.vue";
-import { createApp } from "vue";
-import { createRouter } from "./router";
-import { createAuth0 } from "@auth0/auth0-vue";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faLink, faUser, faPowerOff } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import {createApp} from "vue";
+import {createRouter} from "./router";
+import {createAuth0} from "@auth0/auth0-vue";
+import {library} from "@fortawesome/fontawesome-svg-core";
+import {faLink, faPowerOff, faUser} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import authConfig from "../auth_config.json";
 import hljs from 'highlight.js/lib/core';
 import json from 'highlight.js/lib/languages/json';
@@ -12,6 +12,7 @@ import hljsVuePlugin from "@highlightjs/vue-plugin";
 import "highlight.js/styles/github.css";
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import VueScrollUp from 'vue-scroll-up';
 
 hljs.registerLanguage('json', json);
 
@@ -19,6 +20,9 @@ const app = createApp(App);
 
 library.add(faLink, faUser, faPowerOff);
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+app.component(VueScrollUp.name, VueScrollUp);
 app
   .use(hljsVuePlugin)
   .use(createRouter(app))

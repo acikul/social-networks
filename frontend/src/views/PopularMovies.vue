@@ -58,7 +58,7 @@
     </div>
     <div class="upcoming-movies pb-2">
       <div class="card-group">
-        <div v-for="movie in filteredMovies" :key="movie._id" class="col-sm-4">
+        <div v-for="movie in filteredMovies.slice(0,9)" :key="movie._id" class="col-sm-4">
           <MovieCard :movie="movie" :user="user" @click="showMovieDetails(movie.id)"/>
         </div>
       </div>

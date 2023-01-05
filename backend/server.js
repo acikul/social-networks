@@ -4,7 +4,7 @@ const bodyParser = require("body-parser")
 const { clientConfig, listDatabases, saveUser, getMovies, saveMovie, getMoviesForTimeRange, getCategories, getMovie } = require("./mongo.js")
 const dotenv = require('dotenv');
 const e = require("express");
-const {getRecommendations} = require("./mongo");
+const {getRecommendations, getMoviesPage, getMovieCount, removeMovie} = require("./mongo");
 dotenv.config();
 const app = express();
 app.use(bodyParser.json())
@@ -74,11 +74,15 @@ app.get("/api/movie/details/:id",async (req,res)=>{
     }
 })
 
+app.get("/api/movies/count/get",async (req, res) => {
+    res.json({number: await getMovieCount(client)})
+})
+
 
 app.get("/api/movies/:user", async (req, res) => {
     try {
         result = await getMovies(client, req.params.user)
-        console.log(result);
+        // console.log(result);
         res.json(result)
     } catch (error) {
         res.status(500).send(error);
@@ -94,8 +98,24 @@ app.post("/api/save-movie", (req, res) => {
     }
 });
 
+app.post("/api/remove-movie", async (req, res) => {
+    try {
+        let result = await removeMovie(client, req.body.movie, req.body.user)
+        res.status(200).send()
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
 app.get("/api/movies",async (req,res)=>{
-    res.json(await getMovies(client,null))
+    let page = 1;
+    if(req.query.page) {
+        try{
+            page = parseInt(req.query.page)
+        }catch(error){}
+    }
+
+    res.json(await getMoviesPage(client,page))
 })
 
 app.listen(8080, () => {

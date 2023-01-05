@@ -11,14 +11,14 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-              <router-link to="/" class="nav-link">Upcoming</router-link>
+              <router-link to="/" class="nav-link">Home</router-link>
             </li>
             <li class="nav-item" v-if="isAuthenticated">
               <router-link to="/watched" class="nav-link">Watched</router-link>
             </li>
-            <li class="nav-item" v-if="isAuthenticated">
-              <router-link to="/search" class="nav-link">Search</router-link>
-            </li>
+<!--            <li class="nav-item" v-if="isAuthenticated">-->
+<!--              <router-link to="/search" class="nav-link">Search</router-link>-->
+<!--            </li>-->
             <li class="nav-item" v-if="isAuthenticated">
               <router-link to="/popular" class="nav-link">Popular</router-link>
             </li>
@@ -73,6 +73,7 @@
         </div>
       </div>
     </nav>
+
   </div>
 </template>
 

@@ -50,7 +50,6 @@ async function getMovies(client, email) {
     const collectionMovies = client.db("drumre").collection("movies");
     const collectionUsers = client.db("drumre").collection("users");
     if (email) {
-        console.log("heloo!");
         const user = await collectionUsers.findOne({
             _id: email
         })
@@ -62,6 +61,13 @@ async function getMovies(client, email) {
     }
     return await collectionMovies.find().limit(20).toArray()
 }
+
+async function getMoviesPage(client, page) {
+    const collectionMovies = client.db("drumre").collection("movies");
+    //neda mi se radit ovo 12 element po stranici je
+    return await collectionMovies.find({}).skip((page-1)*12).limit(12).toArray()
+}
+
 
 async function getMovie(client, id) {
     const collectionMovies = client.db("drumre").collection("movies");
@@ -125,7 +131,9 @@ async function getMoviesForTimeRange(client, range) {
     return result
 
 }
-
+async function getMovieCount(client){
+    return client.db("drumre").collection("movies").count();
+}
 async function saveMovie(client, movieId, user) {
     const collection = client.db("drumre").collection("users");
     await collection.findOneAndUpdate(
@@ -135,6 +143,32 @@ async function saveMovie(client, movieId, user) {
                 watched: {
                     movieId: movieId,
                     timestamp: Date.now()
+                }
+            }
+        },
+        {upsert: true},
+        (error, result) => {
+            if (error) {
+                console.log(error);
+                throw error;
+            } else {
+                // console.log("Success saving movie:");
+                // console.log(result);
+                return result
+            }
+        }
+    );
+}
+
+async function removeMovie(client, movieId, user) {
+    const collection = client.db("drumre").collection("users");
+    console.log(`DOING SHIT WITH ${movieId} and ${user.email}`)
+    await collection.findOneAndUpdate(
+        {_id: user.email},
+        {
+            $pull: {
+                watched: {
+                    movieId: movieId,
                 }
             }
         },
@@ -234,4 +268,7 @@ module.exports = {
     getCategories,
     getMovie,
     getRecommendations,
+    getMoviesPage,
+    getMovieCount,
+    removeMovie
 }
